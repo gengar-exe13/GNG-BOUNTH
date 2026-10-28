@@ -249,20 +249,39 @@ function UI:SetAccentColor(name)
 end
 UI.SetTheme = UI.SetAccentColor
 function UI:SetCornerStyle() end
+local __ROUNDABLE = { Frame = true, TextButton = true, TextBox = true }
 local function new(class, props, children)
 	local inst = Instance.new(class)
 	for k, v in pairs(props or {}) do inst[k] = v end
-	for _, c in ipairs(children or {}) do c.Parent = inst end
+	local hasCorner = false
+	for _, c in ipairs(children or {}) do
+		c.Parent = inst
+		if c.ClassName == "UICorner" then hasCorner = true end
+	end
+	if __ROUNDABLE[class] and not hasCorner then
+		pcall(function()
+			if inst.BackgroundTransparency >= 1 then return end
+			local w, h = inst.Size.X.Offset, inst.Size.Y.Offset
+			local m = math.huge
+			if inst.Size.X.Scale == 0 then m = math.min(m, w) end
+			if inst.Size.Y.Scale == 0 then m = math.min(m, h) end
+			if m < 6 then return end
+			local r = m == math.huge and 6 or math.max(3, math.min(8, math.floor(m / 3)))
+			local c = Instance.new("UICorner")
+			c.CornerRadius = UDim.new(0, r)
+			c.Parent = inst
+		end)
+	end
 	return inst
 end
 local function stroke(color, thickness)
 	return new("UIStroke", {
 		Color = color or Theme.Border, Thickness = thickness or 1,
-		ApplyStrokeMode = Enum.ApplyStrokeMode.Border, LineJoinMode = Enum.LineJoinMode.Miter,
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border, LineJoinMode = Enum.LineJoinMode.Round,
 	})
 end
 local function gloss()
-	return new("UIGradient", { Rotation = 90, Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(176, 176, 176)) })
+	return new("UIGradient", { Rotation = 90, Color = ColorSequence.new(Color3.fromRGB(255, 255, 255), Color3.fromRGB(236, 232, 245)) })
 end
 local function pad(l, t, r, b)
 	return new("UIPadding", {
@@ -1222,7 +1241,7 @@ function UI:CreateWindow(config)
 	local Main = new("Frame", {
 		Name = "Main", BackgroundColor3 = Theme.Background, BorderSizePixel = 0, Size = UDim2.new(0, size.X, 0, size.Y),
 		Position = config.Position or UDim2.new(0, 70, 0.5, -size.Y / 2), Parent = ScreenGui,
-	}, { stroke(Theme.Border, 2), new("UIScale", { Scale = scale }) })
+	}, { stroke(Theme.Border, 2), new("UIScale", { Scale = scale }), new("UICorner", { CornerRadius = UDim.new(0, 12) }) })
 	pcall(function()
 		local st = Main:FindFirstChildOfClass("UIStroke")
 		if st then
@@ -1250,7 +1269,8 @@ function UI:CreateWindow(config)
 	end
 	local controls = config.Controls == true
 	local TB_H = controls and 26 or 22
-	local titlebar = new("Frame", { BackgroundColor3 = Theme.Title, BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, TB_H), Parent = Main })
+	local titlebar = new("Frame", { BackgroundColor3 = Theme.Title, BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, TB_H), Parent = Main }, { new("UICorner", { CornerRadius = UDim.new(0, 12) }) })
+	new("Frame", { BackgroundColor3 = Theme.Title, BorderSizePixel = 0, AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 0, 1, 0), Size = UDim2.new(1, 0, 0, 12), Parent = titlebar }, { new("UICorner", { CornerRadius = UDim.new(0, 0) }) })
 	if controls then
 		pcall(drawGengarFace, titlebar, 32, 0, Vector2.new(0, 0.5), UDim2.new(0, 6, 0.5, 0))
 		label({ Text = title, Position = UDim2.new(0, 44, 0, 0), Size = UDim2.new(1, -150, 1, 0), TextTruncate = Enum.TextTruncate.AtEnd, Parent = titlebar })
@@ -1643,7 +1663,7 @@ do
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local LP = Players.LocalPlayer
-local BG, PURPLE, LILAC, DIM = Color3.fromRGB(25, 20, 35), Color3.fromRGB(150, 60, 255), Color3.fromRGB(226, 208, 255), Color3.fromRGB(150, 125, 200)
+local BG, PURPLE, LILAC, DIM = Color3.fromRGB(52, 28, 92), Color3.fromRGB(150, 60, 255), Color3.fromRGB(240, 228, 255), Color3.fromRGB(196, 172, 238)
 getgenv().GNGPanel = function(cfg)
     local gui = Instance.new("ScreenGui")
     gui.Name = cfg.name
@@ -1658,18 +1678,18 @@ getgenv().GNGPanel = function(cfg)
     local main = Instance.new("Frame")
     main.Name = "Main"
     main.BackgroundColor3 = BG
-    main.BackgroundTransparency = 0.05
+    main.BackgroundTransparency = 0
     main.BorderSizePixel = 0
     main.Position = UDim2.new(0.5, -math.floor(W / 2), 0, 12)
     main.Size = UDim2.fromOffset(W, H)
     main.Parent = gui
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 0)
+    corner.CornerRadius = UDim.new(0, 16)
     corner.Parent = main
     local stroke = Instance.new("UIStroke")
     stroke.Color = PURPLE
     stroke.Thickness = 2
-    stroke.LineJoinMode = Enum.LineJoinMode.Miter
+    stroke.LineJoinMode = Enum.LineJoinMode.Round
     stroke.Parent = main
     local accent = Instance.new("Frame")
     accent.BorderSizePixel = 0
@@ -1679,14 +1699,14 @@ getgenv().GNGPanel = function(cfg)
     accent.BackgroundTransparency = 0.35
     accent.Parent = main
     local ac = Instance.new("UICorner")
-    ac.CornerRadius = UDim.new(0, 0)
+    ac.CornerRadius = UDim.new(1, 0)
     ac.Parent = accent
     local ag = Instance.new("UIGradient")
     ag.Color = ColorSequence.new(Color3.fromRGB(110, 40, 220), Color3.fromRGB(255, 84, 160))
     ag.Parent = accent
     local bgGrad = Instance.new("UIGradient")
     bgGrad.Rotation = 90
-    bgGrad.Color = ColorSequence.new(Color3.fromRGB(38, 24, 62), Color3.fromRGB(20, 15, 30))
+    bgGrad.Color = ColorSequence.new(Color3.fromRGB(78, 44, 128), Color3.fromRGB(52, 28, 92))
     bgGrad.Parent = main
     if getgenv().GNGDrawFace then
         pcall(getgenv().GNGDrawFace, main, 54, 0, Vector2.new(0, 0), UDim2.new(0, 12, 0, 14))
@@ -1710,12 +1730,12 @@ getgenv().GNGPanel = function(cfg)
     pill.BorderSizePixel = 0
     pill.Parent = main
     local pc = Instance.new("UICorner")
-    pc.CornerRadius = UDim.new(0, 0)
+    pc.CornerRadius = UDim.new(1, 0)
     pc.Parent = pill
     local ps = Instance.new("UIStroke")
     ps.Color = Color3.fromRGB(90, 255, 140)
     ps.Thickness = 1
-    ps.LineJoinMode = Enum.LineJoinMode.Miter
+    ps.LineJoinMode = Enum.LineJoinMode.Round
     ps.Parent = pill
     local pt = Instance.new("TextLabel")
     pt.BackgroundTransparency = 1
@@ -1745,7 +1765,7 @@ getgenv().GNGPanel = function(cfg)
             stripe.BackgroundTransparency = 0.9
             stripe.Parent = main
             local sc = Instance.new("UICorner")
-            sc.CornerRadius = UDim.new(0, 0)
+            sc.CornerRadius = UDim.new(0, 8)
             sc.Parent = stripe
         end
         local l = Instance.new("TextLabel")
