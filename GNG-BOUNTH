@@ -1674,7 +1674,7 @@ getgenv().GNGPanel = function(cfg)
     if not pcall(function() gui.Parent = parent end) then gui.Parent = LP:WaitForChild("PlayerGui") end
     local rowsN = #cfg.rows
     local W, RH = cfg.w or 320, cfg.rh or 25
-    local H = 66 + rowsN * RH + 8
+    local H = 46 + rowsN * RH + 8
     local main = Instance.new("Frame")
     main.Name = "Main"
     main.BackgroundColor3 = BG
@@ -1693,8 +1693,8 @@ getgenv().GNGPanel = function(cfg)
     stroke.Parent = main
     local accent = Instance.new("Frame")
     accent.BorderSizePixel = 0
-    accent.Position = UDim2.fromOffset(14, 6)
-    accent.Size = UDim2.new(1, -28, 0, 4)
+    accent.Position = UDim2.fromOffset(14, 5)
+    accent.Size = UDim2.new(1, -28, 0, 3)
     accent.BackgroundColor3 = PURPLE
     accent.BackgroundTransparency = 0.35
     accent.Parent = main
@@ -1709,12 +1709,12 @@ getgenv().GNGPanel = function(cfg)
     bgGrad.Color = ColorSequence.new(Color3.fromRGB(78, 44, 128), Color3.fromRGB(52, 28, 92))
     bgGrad.Parent = main
     if getgenv().GNGDrawFace then
-        pcall(getgenv().GNGDrawFace, main, 54, 0, Vector2.new(0, 0), UDim2.new(0, 12, 0, 14))
+        pcall(getgenv().GNGDrawFace, main, 36, 0, Vector2.new(0, 0), UDim2.new(0, 10, 0, 9))
     end
     local title = Instance.new("TextLabel")
     title.BackgroundTransparency = 1
-    title.Position = UDim2.fromOffset(74, 20)
-    title.Size = UDim2.new(1, -(W - 150), 0, 22)
+    title.Position = UDim2.fromOffset(52, 13)
+    title.Size = UDim2.new(1, -140, 0, 22)
     title.Font = Enum.Font.GothamBlack
     title.TextSize = cfg.ts or 17
     title.TextXAlignment = Enum.TextXAlignment.Left
@@ -1723,8 +1723,8 @@ getgenv().GNGPanel = function(cfg)
     title.Parent = main
     local pill = Instance.new("Frame")
     pill.AnchorPoint = Vector2.new(1, 0)
-    pill.Position = UDim2.new(1, -12, 0, 18)
-    pill.Size = UDim2.fromOffset(96, 24)
+    pill.Position = UDim2.new(1, -10, 0, 12)
+    pill.Size = UDim2.fromOffset(80, 20)
     pill.BackgroundColor3 = Color3.fromRGB(90, 255, 140)
     pill.BackgroundTransparency = 0.82
     pill.BorderSizePixel = 0
@@ -1741,21 +1741,21 @@ getgenv().GNGPanel = function(cfg)
     pt.BackgroundTransparency = 1
     pt.Size = UDim2.fromScale(1, 1)
     pt.Font = Enum.Font.GothamBold
-    pt.TextSize = 10
+    pt.TextSize = 9
     pt.TextColor3 = Color3.fromRGB(90, 255, 140)
     pt.TextTruncate = Enum.TextTruncate.AtEnd
     pt.Text = "-"
     pt.Parent = pill
     local div = Instance.new("Frame")
     div.BorderSizePixel = 0
-    div.Position = UDim2.fromOffset(12, 62)
+    div.Position = UDim2.fromOffset(12, 44)
     div.Size = UDim2.new(1, -24, 0, 1)
     div.BackgroundColor3 = PURPLE
     div.BackgroundTransparency = 0.5
     div.Parent = main
     local vals = {}
     for i, name in ipairs(cfg.rows) do
-        local y = 68 + (i - 1) * RH
+        local y = 48 + (i - 1) * RH
         if i % 2 == 1 then
             local stripe = Instance.new("Frame")
             stripe.BorderSizePixel = 0
@@ -1771,7 +1771,7 @@ getgenv().GNGPanel = function(cfg)
         local l = Instance.new("TextLabel")
         l.BackgroundTransparency = 1
         l.Position = UDim2.fromOffset(16, y)
-        l.Size = UDim2.fromOffset(100, RH - 2)
+        l.Size = UDim2.fromOffset(84, RH - 2)
         l.Font = Enum.Font.GothamMedium
         l.TextSize = cfg.fs or 12
         l.TextXAlignment = Enum.TextXAlignment.Left
@@ -1780,10 +1780,10 @@ getgenv().GNGPanel = function(cfg)
         l.Parent = main
         local v = Instance.new("TextLabel")
         v.BackgroundTransparency = 1
-        v.Position = UDim2.fromOffset(100, y)
-        v.Size = UDim2.new(1, -116, 0, RH - 2)
+        v.Position = UDim2.fromOffset(84, y)
+        v.Size = UDim2.new(1, -100, 0, RH - 2)
         v.Font = Enum.Font.GothamBold
-        v.TextSize = (cfg.fs or 12) + 1
+        v.TextSize = cfg.fs or 12
         v.TextXAlignment = Enum.TextXAlignment.Right
         v.TextColor3 = LILAC
         v.Text = "-"
@@ -1814,8 +1814,11 @@ getgenv().GNGPanel = function(cfg)
         pill.BackgroundColor3 = color
         ps.Color = color
     end
-    function P.set(name, text)
-        if vals[name] then vals[name].Text = tostring(text) end
+    function P.set(name, text, color)
+        if vals[name] then
+            vals[name].Text = tostring(text)
+            if color then vals[name].TextColor3 = color end
+        end
     end
     function P.destroy()
         for _, c in ipairs(conns) do pcall(function() c:Disconnect() end) end
@@ -1827,7 +1830,7 @@ end
 local UIS = game:GetService("UserInputService")
 local __GNGWindow = SugarUI:CreateWindow({
     Title = "GNG", Badge = "Bounty", ServerName = "by GENGAR", ToggleKey = false, Theme = "Gengar",
-    Size = Vector2.new(470, 460), Scale = 1, Controls = true, Watermark = true, Search = true, ActiveList = false,
+    Size = Vector2.new(470, 460), Scale = 0.88, Controls = true, Watermark = true, Search = true, ActiveList = false,
 })
 local WindUI = {}
 function WindUI:GetThemes() return { Gengar = true } end
@@ -1905,6 +1908,8 @@ function Window:Tab(t)
     __tabs[#__tabs + 1] = p
     p.Index = #__tabs
     p._tab = __GNGWindow._tabs[#__GNGWindow._tabs]
+    local __ic = { ["message-circle"] = "heart", crosshair = "target", keyboard = "list", swords = "sword", eye = "eye", server = "home", settings = "gear" }
+    pcall(function() p._tab:SetIcon(__ic[t.Icon] or "dot") end)
     return p
 end
 function Window:SelectTab(i) local p = __tabs[i] if p then pcall(function() __GNGWindow:SelectTab(p._tab) end) end end
@@ -3053,9 +3058,9 @@ local function GetInfoPanelParent()
     return LocalPlayer:FindFirstChild("PlayerGui")
 end
 local GNGBP
-local GNGRows = { T("TARGET"), T("Bounty"), T("EARNED"), T("PER HOUR"), T("TIME"), T("SERVER TIME"), T("PLAYERS") }
+local GNGRows = { T("TARGET"), T("BOUNTY"), T("EARNED"), T("PER HOUR"), T("TIME") }
 local function GNGBuildPanel()
-    GNGBP = getgenv().GNGPanel({ name = "GNGBountyPanel", title = "GNG-BOUNTY", w = 360, rh = 28, fs = 16, ts = 22, rows = GNGRows })
+    GNGBP = getgenv().GNGPanel({ name = "GNGBountyPanel", title = "GNG-BOUNTY", w = 258, rh = 21, fs = 12, ts = 15, rows = GNGRows })
 end
 pcall(GNGBuildPanel)
 local function SetPanelStatus()
@@ -3075,12 +3080,10 @@ task.spawn(function()
             local earned = GetEarnedBounty()
             local t = GetRunTime()
             GNGBP.set(GNGRows[1], CurrentTarget and CurrentTarget.Name or "-")
-            GNGBP.set(GNGRows[2], current and FormatNumber(current) or "-")
-            GNGBP.set(GNGRows[3], (earned >= 0 and "+" or "") .. FormatNumber(earned))
-            GNGBP.set(GNGRows[4], t > 30 and FormatNumber(math.floor(earned / t * 3600)) or "-")
+            GNGBP.set(GNGRows[2], current and FormatNumber(current) or "-", Color3.fromRGB(255, 214, 102))
+            GNGBP.set(GNGRows[3], (earned >= 0 and "+" or "") .. FormatNumber(earned), earned >= 0 and Color3.fromRGB(90, 255, 140) or Color3.fromRGB(255, 90, 110))
+            GNGBP.set(GNGRows[4], t > 30 and FormatNumber(math.floor(earned / t * 3600)) or "-", Color3.fromRGB(190, 140, 255))
             GNGBP.set(GNGRows[5], FormatRunTime(t))
-            GNGBP.set(GNGRows[6], FormatRunTime(tick() - SCRIPT_START_TICK))
-            GNGBP.set(GNGRows[7], #Players:GetPlayers() .. "/" .. Players.MaxPlayers)
             SetPanelStatus()
         end)
     end
